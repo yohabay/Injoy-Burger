@@ -1,0 +1,54 @@
+{
+  "rating": 4,
+  "count": 334,
+  "address": "2Q2M+4H, Namibia St, Addis Ababa, Ethiopia",
+  "photos": [
+    { "url": "/media/google/Injoy-g0.jpg", "author": "Hannah Berr" },
+    { "url": "/media/google/Injoy-g1.jpg", "author": "Ahmed Albalawi" },
+    { "url": "/media/google/Injoy-g2.jpg", "author": "Ethiopiatravelers" },
+    { "url": "/media/google/Injoy-g3.jpg", "author": "Ethiopiatravelers" },
+    { "url": "/media/google/Injoy-g4.jpg", "author": "Yonas Desalegn" },
+    { "url": "/media/google/Injoy-g5.jpg", "author": "Nathnael Tekabe" },
+    { "url": "/media/google/Injoy-g6.jpg", "author": "Yonas Desalegn" },
+    { "url": "/media/google/Injoy-g7.jpg", "author": "coach mousa" },
+    { "url": "/media/google/Injoy-g8.jpg", "author": "Muaz" },
+    { "url": "/media/google/Injoy-g9.jpg", "author": "ayman aljudaya" }
+  ],
+  "reviews": [
+    {
+      "author": "Salome Aklil",
+      "photo": "https://lh3.googleusercontent.com/a-/ALV-UjWV_1Jp06jezLr6oe_ZJfuH1rHnDJ6gZ71byDmAvigKWBkHS9p0SA=s128-c0x00000000-cc-rp-mo-ba2",
+      "rating": 3,
+      "text": "A hidden small burger place around bole that was recommended to me for a good burger with reasonable price.\n\nWe had the Triple and the Malmo Injoy. The triple was good for it's price but not as big as I expected. It was mostly meat and some egg and cheese, it's wasn't flavorful but nice. The Malmo had pickles and caramelized onion, I didn't like it at all. I thought it would taste nice and flavorful. But something was off with the caramelized onion. I like caramelized onion but I didn't enjoy this one.\n\nI honestly could have put up with all of the above, if the service was at least good. But unfortunately it wasn't. The place wasn't busy at all but the service in general, from taking orders to mixing up receipts, was really poor. At least they tried to correct the issue immediately, I'll give them that.\n\nDespite everything, the burger wasn't bad, their added side sauce for 50 birr was great and the atmosphere was kinda good.",
+      "when": "4 months ago"
+    },
+    {
+      "author": "Heaven Tesfaye",
+      "photo": "https://lh3.googleusercontent.com/a/ACg8ocK2G9hgQ7jw7k6eaHu8Q0OgVFCtmfXwBf2mSka4zdg2xhFDoA=s128-c0x00000000-cc-rp-mo",
+      "rating": 5,
+      "text": "Loved the burgers, great taste and seasoning. The portions may seem small but it's very filling. Probably one of the best burgers in Addis. Small issue is the house is very crowded which leads to late orders and also not much ventilation going on so it can be a bit suffocating.",
+      "when": "5 months ago"
+    },
+    {
+      "author": "Kyle Del Rosario",
+      "photo": "https://lh3.googleusercontent.com/a-/ALV-UjUnZUD9XylIq7im7Z1UHvJMDfx2UUVqPU0PWgwJmhadzuZMnfrV_A=s128-c0x00000000-cc-rp-mo-ba3",
+      "rating": 5,
+      "text": "Came back for round two after delivery the other night - completely different experience fresh. The burgers hit way harder straight off the grill. If you\u2019re in Addis and craving American-style Injoy burgers, this is the spot. Don\u2019t do delivery, come in person. Bonus - Music selections were \ud83d\udd25",
+      "when": "5 months ago"
+    },
+    {
+      "author": "Nathnael Tekabe",
+      "photo": "https://lh3.googleusercontent.com/a-/ALV-UjWbtQUzNbUHZuGFXozGSZlZjpshiywunV6WIi2b5WTAmIfb-T4=s128-c0x00000000-cc-rp-mo-ba4",
+      "rating": 5,
+      "text": "I ordered a breakfast pita for delivery. Shortly after placing the order, they called me to say they were unfortunately out of pita bread. They asked if I would be okay with having the filling served on a burger bun instead, and I said yes.\nI am so glad I agreed! The breakfast sandwich on the burger bun was absolutely delicious\u2014I actually liked it better than the pita I usually get! The food was not disappointing at all.\nGreat service for calling me immediately about the substitution.\nSuggestion to Management: The sandwich on the burger bun was so good, it should definitely come out as a permanent breakfast option.",
+      "when": "6 months ago"
+    },
+    {
+      "author": "Funbel 90",
+      "photo": "https://lh3.googleusercontent.com/a/ACg8ocJ1vOm2sF-SvtBXDskRKKM-trSJAZJXpxiXiaUR2NXTjILDS8w=s128-c0x00000000-cc-rp-mo",
+      "rating": 1,
+      "text": "The meat was a bit strong for a burger and tastes like shekla tebs literally \ud83d\ude2d\ud83d\ude02 and the cheese was dry like you can tell the it was not heated and because people kept telling me \u201cthey are good, they just not consistent\u201d i have tried it 3 times but it was the same thing. It was just not it i rather go eat injoy or some 0 rating home made look a like burgers places.",
+      "when": "3 weeks ago"
+    }
+  ]
+}
