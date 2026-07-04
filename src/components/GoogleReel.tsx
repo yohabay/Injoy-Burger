@@ -4,7 +4,7 @@ import data from "@/lib/smash-google.json";
 import { assetUrl } from "@/lib/asset-url";
 
 const ORBIT_RADIUS = 280;
-const MOBILE_ORBIT_RADIUS = 200;
+const MOBILE_ORBIT_RADIUS = 150;
 const ANIMATION_DURATION = 40;
 const TOTAL_PHOTOS = data.photos.length;
 
