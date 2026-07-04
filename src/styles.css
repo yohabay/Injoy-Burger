@@ -113,6 +113,16 @@ html { scroll-behavior: smooth; }
   .sticky-viewport {
     height: 100vh !important;
   }
+  .sticky-viewport video {
+    width: 100vw !important;
+    height: 100vh !important;
+    object-fit: cover !important;
+  }
+  .google-reel-container {
+    width: 320px !important;
+    height: 320px !important;
+  }
+}
   .sticky-viewport > div > div > video,
   .sticky-viewport video {
     width: 100vw !important;

@@ -35,10 +35,8 @@ export function GoogleReel() {
         </h2>
       </div>
 
-      <div className="relative mx-auto w-[640px] h-[640px]">
-        <div 
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full overflow-hidden z-10 border-2 border-orange-500/30"
-        >
+      <div className="relative mx-auto w-[320px] h-[320px] md:w-[640px] md:h-[640px]">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full overflow-hidden z-10 border-2 border-orange-500/30">
           <img
             src="/media/google/logoimage.png"
             alt="Injoy logo"
@@ -56,7 +54,7 @@ export function GoogleReel() {
             return (
               <motion.div
                 key={i}
-                className="absolute w-44 h-44 rounded-2xl overflow-hidden ring-2 ring-white/30 shadow-2xl cursor-pointer"
+                className="absolute w-44 h-44 rounded-2xl overflow-hidden ring-2 ring-white/30 shadow-2xl cursor-pointer md:w-44 md:h-44"
                 style={{
                   left: `calc(50% + ${ORBIT_RADIUS * Math.cos((angle - 90) * Math.PI / 180)}px)`,
                   top: `calc(50% + ${ORBIT_RADIUS * Math.sin((angle - 90) * Math.PI / 180)}px)`,
