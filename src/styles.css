@@ -123,10 +123,3 @@ html { scroll-behavior: smooth; }
     height: 320px !important;
   }
 }
-  .sticky-viewport > div > div > video,
-  .sticky-viewport video {
-    width: 100vw !important;
-    height: 100vh !important;
-    object-fit: cover !important;
-  }
-}
