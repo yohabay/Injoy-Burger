@@ -19,7 +19,7 @@ export type MenuItem = {
   name: string;
   tag: string;
   desc: string;
-  price: number; // ETB
+  price: number;
   img: string;
   video?: string;
   category: "Most Ordered" | "Main Dish";
@@ -118,13 +118,23 @@ export const MENU: MenuItem[] = [
 
 export const RESTAURANT = {
   name: "Injoy BURGERS",
-  address: "Namibia St, 2Q2M+4H, Bole, Addis Ababa",
-  lat: 9.0002479,
-  lng: 38.7839168,
-  whatsapp: "251962629663", // E.164 without +
+  address: "Medhane Alem Building, Namibia St, Addis Ababa",
+
+  location: {
+    lat: 8.9976892,
+    lng: 38.7863959,
+  },
+
+  whatsapp: "251940878787",
   hours: "11:30 — 22:30 · Mon — Sun",
+
+  // SAFE: always works, no undefined risk
+  mapUrl: "https://www.google.com/maps/place/IN-JOY+Burger/@8.9976892,38.7863959,17z/data=!3m1!4b1!4m6!3m5!1s0x164b8503a9a8e7c1:0xed483084a1220883!8m2!3d8.9976892!4d38.7863959!16s%2Fg%2F11bzywbm9b?entry=ttu&g_ep=EgoyMDI2MDYyOS4wIKXMDSoASAFQAw%3D%3D",
 };
 
 export function birr(n: number) {
-  return `ETB ${n.toLocaleString("en-ET", { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 })}`;
+  return `ETB ${n.toLocaleString("en-ET", {
+    minimumFractionDigits: n % 1 ? 2 : 0,
+    maximumFractionDigits: 2,
+  })}`;
 }

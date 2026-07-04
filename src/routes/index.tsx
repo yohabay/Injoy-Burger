@@ -709,7 +709,7 @@ function MapFlyTo() {
               {RESTAURANT.hours}
             </p>
             <a
-              href={`https://www.google.com/maps/place/${RESTAURANT.lat},${RESTAURANT.lng}`}
+              href={RESTAURANT.mapUrl}
               target="_blank"
               rel="noreferrer"
               className="mt-4 inline-block font-mono text-[10px] uppercase tracking-[0.3em] text-accent underline"
@@ -1793,8 +1793,8 @@ function RiderCam() {
                 "🔥 Patty Injoyed @ 232°C",
                 "🧀 Cheese Melted To Spec",
                 "📦 Heat-Sealed Box · 64°C",
-                "📍 ETA Locked · 9 min",
-                "⭐ ★ 4.97 Rider Rating",
+                "📍 ETA Locked · 20 min",
+                "⭐ ★ 3.6 Rider Rating",
                 "🎬 Live Feed · Bole 2Q2M+4H",
               ].map((t, i) => <span key={`${j}-${i}`}>{t}</span>),
             )}
@@ -1810,10 +1810,10 @@ function RiderCam() {
    ============================================================ */
 function StatsCounter() {
   const stats = [
-    { label: "Patties Injoyed", value: 184320, suffix: "+" },
-    { label: "Avg Delivery", value: 14, suffix: " min" },
-    { label: "Repeat Eaters", value: 92, suffix: "%" },
-    { label: "Rider Rating", value: 4.97, suffix: "★", decimals: 2 },
+    { label: "Patties Injoyed", value: 4620, suffix: "+" },
+    { label: "Avg Delivery", value: 20, suffix: " min" },
+    { label: "Repeat Eaters", value: 87, suffix: "%" },
+    { label: "Rider Rating", value: 3.6, suffix: "★", decimals: 2 },
   ];
   return (
     <section className="relative py-24 md:py-32 px-6 md:px-10 bg-background border-y border-border overflow-hidden">

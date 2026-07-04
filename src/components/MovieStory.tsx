@@ -2,6 +2,8 @@ import { RESTAURANT } from "@/lib/menu";
 import { motion, useScroll, useSpring, useTransform, type MotionValue } from "motion/react";
 import { useRef, useEffect } from "react";
 
+import { useIsMobile } from "@/hooks/use-mobile";
+
 import scene01 from "@/assets/scene-01-opening.mp4";
 import scene02 from "@/assets/scene-02-story.mp4";
 import scene03 from "@/assets/scene-03-chef.mp4";
@@ -65,10 +67,10 @@ export function MovieStory({ onOrder, onBook }: { onOrder: () => void; onBook: (
   return (
     <section ref={wrapRef} className="relative" style={{ height: `${SCENES.length * 110}vh` }}>
       {/* Sticky film viewport */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden bg-black">
+      <div className="sticky top-0 h-screen w-full overflow-hidden bg-black sticky-viewport">
         {/* Letterbox bars */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-40 h-[8vh] bg-black" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-40 h-[8vh] bg-black" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-40 h-[8vh] bg-black hidden md:block" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-40 h-[8vh] bg-black hidden md:block" />
 
         {/* Film grain */}
         <div
@@ -164,6 +166,7 @@ function SceneVisual({
   start: number;
   end: number;
 }) {
+  const isMobile = useIsMobile();
   // slow Ken-Burns
   const k = useTransform(progress, [start, end], [1.05, 1.25]);
   const px = useTransform(progress, [start, end], ["-2%", "2%"]);
@@ -185,7 +188,7 @@ function SceneVisual({
         muted
         loop
         playsInline
-        preload="auto"
+        preload={isMobile ? "metadata" : "auto"}
         poster={SCENE_POSTERS[index]}
         className="absolute inset-0 h-full w-full object-cover"
       />
