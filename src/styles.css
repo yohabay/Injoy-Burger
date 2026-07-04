@@ -118,8 +118,4 @@ html { scroll-behavior: smooth; }
     height: 100vh !important;
     object-fit: cover !important;
   }
-  .google-reel-container {
-    width: 320px !important;
-    height: 320px !important;
-  }
 }

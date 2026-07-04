@@ -54,12 +54,12 @@ export function GoogleReel() {
             return (
               <motion.div
                 key={i}
-                className="absolute w-44 h-44 rounded-2xl overflow-hidden ring-2 ring-white/30 shadow-2xl cursor-pointer md:w-44 md:h-44"
+                className="absolute w-20 h-20 md:w-44 md:h-44 rounded-2xl overflow-hidden ring-2 ring-white/30 shadow-2xl cursor-pointer"
                 style={{
                   left: `calc(50% + ${ORBIT_RADIUS * Math.cos((angle - 90) * Math.PI / 180)}px)`,
                   top: `calc(50% + ${ORBIT_RADIUS * Math.sin((angle - 90) * Math.PI / 180)}px)`,
-                  marginLeft: -88,
-                  marginTop: -88,
+                  marginLeft: -40,
+                  marginTop: -40,
                 }}
                 animate={{
                   rotate: -360,
