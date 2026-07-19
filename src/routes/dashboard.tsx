@@ -1,6 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState, useRef, useCallback } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { supabase } from "@/integrations/supabase/client";
 import {
   useMenuItems,
   useSiteVideos,
@@ -33,6 +34,35 @@ export const Route = createFileRoute("/dashboard")({
 
 function DashboardPage() {
   const [tab, setTab] = useState<"menu" | "videos" | "images" | "wheel" | "loyalty">("menu");
+  const [authed, setAuthed] = useState(false);
+  const [checking, setChecking] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) {
+        navigate({ to: "/login" });
+      } else {
+        setAuthed(true);
+      }
+      setChecking(false);
+    });
+  }, [navigate]);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate({ to: "/login" });
+  };
+
+  if (checking) {
+    return (
+      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+        <div className="h-8 w-8 border-2 border-orange-500/30 border-t-orange-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!authed) return null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 text-white">
@@ -49,12 +79,20 @@ function DashboardPage() {
             <p className="text-[10px] text-white/30 font-mono uppercase tracking-widest">Content Manager</p>
           </div>
         </div>
-        <a
-          href="/"
-          className="px-3 py-1.5 rounded-md border border-white/10 text-xs text-white/40 hover:text-white hover:border-white/20 transition-all font-mono"
-        >
-          ← Live Site
-        </a>
+        <div className="flex items-center gap-2">
+          <a
+            href="/"
+            className="px-3 py-1.5 rounded-md border border-white/10 text-xs text-white/40 hover:text-white hover:border-white/20 transition-all font-mono"
+          >
+            ← Live Site
+          </a>
+          <button
+            onClick={handleLogout}
+            className="px-3 py-1.5 rounded-md border border-white/10 text-xs text-white/40 hover:text-red-400 hover:border-red-500/20 transition-all font-mono"
+          >
+            Logout
+          </button>
+        </div>
       </header>
 
       <nav className="sticky top-[65px] z-20 backdrop-blur-xl bg-zinc-950/50 border-b border-white/5 px-6 flex gap-0">
