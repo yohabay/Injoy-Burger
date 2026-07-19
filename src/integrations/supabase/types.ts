@@ -7,13 +7,56 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
+      menu_items: {
+        Row: {
+          id: string
+          number: string
+          name: string
+          tag: string
+          description: string
+          price: number
+          img: string
+          video: string | null
+          category: string
+          sort_order: number
+          active: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          number: string
+          name: string
+          tag?: string
+          description?: string
+          price: number
+          img?: string
+          video?: string | null
+          category?: string
+          sort_order?: number
+          active?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          number?: string
+          name?: string
+          tag?: string
+          description?: string
+          price?: number
+          img?: string
+          video?: string | null
+          category?: string
+          sort_order?: number
+          active?: boolean
+          created_at?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           created_at: string
@@ -77,6 +120,153 @@ export type Database = {
           phone?: string
           reserved_for?: string
           status?: string
+        }
+        Relationships: []
+      }
+      site_images: {
+        Row: {
+          id: string
+          label: string
+          section: string
+          src: string
+          alt: string
+          sort_order: number
+          active: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          label: string
+          section: string
+          src: string
+          alt?: string
+          sort_order?: number
+          active?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          label?: string
+          section?: string
+          src?: string
+          alt?: string
+          sort_order?: number
+          active?: boolean
+          created_at?: string
+        }
+        Relationships: []
+      }
+      site_videos: {
+        Row: {
+          id: string
+          label: string
+          section: string
+          src: string
+          poster: string | null
+          sort_order: number
+          active: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          label: string
+          section: string
+          src: string
+          poster?: string | null
+          sort_order?: number
+          active?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          label?: string
+          section?: string
+          src?: string
+          poster?: string | null
+          sort_order?: number
+          active?: boolean
+          created_at?: string
+        }
+        Relationships: []
+      }
+      spin_wheel: {
+        Row: {
+          id: string
+          label: string
+          code: string
+          color: string
+          sort_order: number
+          active: boolean
+        }
+        Insert: {
+          id?: string
+          label: string
+          code?: string
+          color: string
+          sort_order?: number
+          active?: boolean
+        }
+        Update: {
+          id?: string
+          label?: string
+          code?: string
+          color?: string
+          sort_order?: number
+          active?: boolean
+        }
+        Relationships: []
+      }
+      loyalty_tiers: {
+        Row: {
+          id: string
+          name: string
+          min_points: number
+          color: string
+          sort_order: number
+          active: boolean
+        }
+        Insert: {
+          id?: string
+          name: string
+          min_points: number
+          color: string
+          sort_order?: number
+          active?: boolean
+        }
+        Update: {
+          id?: string
+          name?: string
+          min_points?: number
+          color?: string
+          sort_order?: number
+          active?: boolean
+        }
+        Relationships: []
+      }
+      loyalty_rewards: {
+        Row: {
+          id: string
+          label: string
+          points: number
+          icon: string
+          sort_order: number
+          active: boolean
+        }
+        Insert: {
+          id?: string
+          label: string
+          points: number
+          icon?: string
+          sort_order?: number
+          active?: boolean
+        }
+        Update: {
+          id?: string
+          label?: string
+          points?: number
+          icon?: string
+          sort_order?: number
+          active?: boolean
         }
         Relationships: []
       }

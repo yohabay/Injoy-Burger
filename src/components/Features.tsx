@@ -24,6 +24,9 @@ const sauceImg = `${BUILDER}/sauce.png`;
 const LS_LOYALTY = "Injoy_loyalty_v1";
 type Loyalty = { points: number; orders: number };
 
+type TierDB = { id: string; name: string; min_points: number; color: string; sort_order: number; active: boolean };
+type RewardDB = { id: string; label: string; points: number; icon: string; sort_order: number; active: boolean };
+
 function readLoyalty(): Loyalty {
   if (typeof window === "undefined") return { points: 0, orders: 0 };
   try {
@@ -43,14 +46,15 @@ export function awardLoyalty(amountEtb: number) {
   window.dispatchEvent(new Event("Injoy:loyalty"));
 }
 
-function tierFor(points: number) {
-  if (points >= 500) return { name: "PLATINUM", color: "from-zinc-300 to-zinc-500" };
-  if (points >= 200) return { name: "GOLD", color: "from-amber-300 to-orange-500" };
-  if (points >= 50) return { name: "SILVER", color: "from-zinc-200 to-zinc-400" };
+function tierFor(points: number, tiers: TierDB[]) {
+  const sorted = [...tiers].filter(t => t.active).sort((a, b) => b.min_points - a.min_points);
+  for (const t of sorted) {
+    if (points >= t.min_points) return { name: t.name, color: t.color };
+  }
   return { name: "ROOKIE", color: "from-orange-500 to-red-600" };
 }
 
-export function LoyaltyHud() {
+export function LoyaltyHud({ dbTiers, dbRewards }: { dbTiers: TierDB[]; dbRewards: RewardDB[] }) {
   const [l, setL] = useState<Loyalty>({ points: 0, orders: 0 });
   const [open, setOpen] = useState(false);
   useEffect(() => {
@@ -63,9 +67,12 @@ export function LoyaltyHud() {
       window.removeEventListener("storage", sync);
     };
   }, []);
-  const tier = tierFor(l.points);
-  const nextTier = l.points < 50 ? 50 : l.points < 200 ? 200 : l.points < 500 ? 500 : l.points;
+  const tier = tierFor(l.points, dbTiers);
+  const activeTiers = dbTiers.filter(t => t.active).sort((a, b) => a.min_points - b.min_points);
+  const nextTierObj = activeTiers.find(t => t.min_points > l.points);
+  const nextTier = nextTierObj ? nextTierObj.min_points : l.points;
   const pct = Math.min(100, (l.points / nextTier) * 100);
+  const activeRewards = dbRewards.filter(r => r.active).sort((a, b) => a.points - b.points);
 
   return (
     <>
@@ -114,12 +121,12 @@ export function LoyaltyHud() {
                 />
               </div>
               <div className="mt-1 text-[10px] uppercase tracking-widest text-orange-300/60">
-                {l.points >= 500 ? "Top tier unlocked" : `${nextTier - l.points} pts to next tier`}
+                {nextTierObj ? `${nextTier - l.points} pts to next tier` : "Top tier unlocked"}
               </div>
               <div className="mt-5 grid grid-cols-3 gap-2 text-center">
-                <Reward pts={50} label="Free Fries" unlocked={l.points >= 50} />
-                <Reward pts={200} label="Free Burger" unlocked={l.points >= 200} />
-                <Reward pts={500} label="VIP Table" unlocked={l.points >= 500} />
+                {activeRewards.map((r) => (
+                  <Reward key={r.id} pts={r.points} label={r.label} icon={r.icon} unlocked={l.points >= r.points} />
+                ))}
               </div>
               <button
                 onClick={() => setOpen(false)}
@@ -135,7 +142,7 @@ export function LoyaltyHud() {
   );
 }
 
-function Reward({ pts, label, unlocked }: { pts: number; label: string; unlocked: boolean }) {
+function Reward({ pts, label, icon, unlocked }: { pts: number; label: string; icon: string; unlocked: boolean }) {
   return (
     <div
       className={`rounded-lg border p-2 text-[10px] uppercase tracking-widest transition ${
@@ -144,7 +151,7 @@ function Reward({ pts, label, unlocked }: { pts: number; label: string; unlocked
           : "border-zinc-800 bg-zinc-900 text-zinc-600"
       }`}
     >
-      <div className="text-base">{unlocked ? "🔥" : "🔒"}</div>
+      <div className="text-base">{unlocked ? icon : "🔒"}</div>
       <div className="font-bold">{pts}</div>
       <div className="opacity-80">{label}</div>
     </div>
@@ -216,23 +223,26 @@ export function LiveKitchenTicker() {
 /* ============================================================
    SPIN THE WHEEL — daily discount game
    ============================================================ */
-const WHEEL = [
-  { label: "5% OFF", code: "Injoy5", deg: 0, color: "#f97316" },
-  { label: "FREE FRIES", code: "FRIES", deg: 45, color: "#7c2d12" },
-  { label: "10% OFF", code: "Injoy10", deg: 90, color: "#ea580c" },
-  { label: "TRY AGAIN", code: "", deg: 135, color: "#1c1917" },
-  { label: "15% OFF", code: "Injoy15", deg: 180, color: "#fb923c" },
-  { label: "FREE COKE", code: "COKE", deg: 225, color: "#7c2d12" },
-  { label: "20% OFF", code: "FIRE20", deg: 270, color: "#dc2626" },
-  { label: "TRY AGAIN", code: "", deg: 315, color: "#1c1917" },
-];
 const LS_WHEEL = "Injoy_wheel_v1";
 
-export function SpinWheel({ onCode }: { onCode: (code: string) => void }) {
+type WheelDBSegment = { id: string; label: string; code: string; color: string; sort_order: number; active: boolean };
+
+export function SpinWheel({ onCode, dbSegments }: { onCode: (code: string) => void; dbSegments: WheelDBSegment[] }) {
   const rot = useMotionValue(0);
   const [result, setResult] = useState<string | null>(null);
   const [spinning, setSpinning] = useState(false);
   const [used, setUsed] = useState(false);
+
+  const WHEEL = dbSegments.length > 0
+    ? dbSegments.map((s, i) => ({
+        label: s.label,
+        code: s.code,
+        deg: (i * (360 / dbSegments.length)),
+        color: s.color,
+      }))
+    : [];
+
+  const segmentAngle = WHEEL.length > 0 ? 360 / WHEEL.length : 45;
 
   useEffect(() => {
     const last = localStorage.getItem(LS_WHEEL);
@@ -240,7 +250,7 @@ export function SpinWheel({ onCode }: { onCode: (code: string) => void }) {
   }, []);
 
   const spin = () => {
-    if (spinning || used) return;
+    if (spinning || used || WHEEL.length === 0) return;
     setSpinning(true);
     setResult(null);
     const winIdx = Math.floor(Math.random() * WHEEL.length);
@@ -257,6 +267,8 @@ export function SpinWheel({ onCode }: { onCode: (code: string) => void }) {
       },
     });
   };
+
+  if (WHEEL.length === 0) return null;
 
   return (
     <section className="relative px-6 py-24 bg-gradient-to-b from-black via-zinc-950 to-black">
@@ -290,8 +302,8 @@ export function SpinWheel({ onCode }: { onCode: (code: string) => void }) {
           >
             <svg viewBox="0 0 200 200" className="w-full h-full">
               {WHEEL.map((w, i) => {
-                const a1 = ((i * 45 - 90) * Math.PI) / 180;
-                const a2 = (((i + 1) * 45 - 90) * Math.PI) / 180;
+                const a1 = ((i * segmentAngle - 90) * Math.PI) / 180;
+                const a2 = (((i + 1) * segmentAngle - 90) * Math.PI) / 180;
                 const x1 = 100 + 100 * Math.cos(a1);
                 const y1 = 100 + 100 * Math.sin(a1);
                 const x2 = 100 + 100 * Math.cos(a2);
@@ -314,7 +326,7 @@ export function SpinWheel({ onCode }: { onCode: (code: string) => void }) {
                       fontSize="8"
                       fontWeight="800"
                       fill="#fff"
-                      transform={`rotate(${i * 45 + 22.5} ${tx} ${ty})`}
+                      transform={`rotate(${i * segmentAngle + segmentAngle / 2} ${tx} ${ty})`}
                     >
                       {w.label}
                     </text>

@@ -10,8 +10,9 @@ import {
 } from "motion/react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 
-import { MENU, RESTAURANT, birr, type MenuItem } from "@/lib/menu";
+import { RESTAURANT, birr, type MenuItem } from "@/lib/menu";
 import { bookTable, placeOrder } from "@/lib/orders.functions";
+import { useMenuItems, useSiteVideos, useSiteImages, useWheelSegments, useLoyaltyTiers, useLoyaltyRewards } from "@/lib/content.queries";
 
 import heroBurger from "@/assets/hero-burger.jpg";
 import riderImg from "@/assets/rider.jpg";
@@ -26,10 +27,6 @@ import {
 } from "@/components/Features";
 import { GoogleReel } from "@/components/GoogleReel";
 import { MovieStory } from "@/components/MovieStory";
-
-const HERO_VIDEO_SRC = "/media/hero-cinematic.mp4";
-const EATING_VIDEO_SRC = "/media/eating-burger.mp4";
-const RIDER_VIDEO_SRC = "/media/rider-ride.mp4";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -67,6 +64,37 @@ function Index() {
     teLink: string;
   } | null>(null);
 
+  const { data: dbMenu } = useMenuItems();
+  const { data: dbVideos } = useSiteVideos();
+  const { data: dbImages } = useSiteImages();
+  const { data: dbWheel } = useWheelSegments();
+  const { data: dbTiers } = useLoyaltyTiers();
+  const { data: dbRewards } = useLoyaltyRewards();
+
+  const activeMenu: MenuItem[] = (dbMenu ?? [])
+    .filter((m: any) => m.active !== false)
+    .map((m: any) => ({
+      id: m.id,
+      number: m.number,
+      name: m.name,
+      tag: m.tag,
+      desc: m.description,
+      price: m.price,
+      img: m.img,
+      video: m.video ?? undefined,
+      category: m.category,
+    }));
+
+  const videoSrc = (label: string) => {
+    if (!dbVideos || dbVideos.length === 0) return "";
+    const v = dbVideos.find((x: any) => x.label === label && x.active !== false);
+    return v?.src ?? "";
+  };
+
+  const heroVideo = videoSrc("hero-cinematic");
+  const eatingVideo = videoSrc("eating-burger");
+  const riderVideo = videoSrc("rider-ride");
+
   const addToCart = (id: string) => setCart((c) => ({ ...c, [id]: (c[id] ?? 0) + 1 }));
   const removeFromCart = (id: string) =>
     setCart((c) => {
@@ -80,7 +108,7 @@ function Index() {
 
   const cartCount = Object.values(cart).reduce((a, b) => a + b, 0);
   const cartTotal = Object.entries(cart).reduce(
-    (sum, [id, q]) => sum + (MENU.find((m) => m.id === id)?.price ?? 0) * q,
+    (sum, [id, q]) => sum + (activeMenu.find((m) => m.id === id)?.price ?? 0) * q,
     0,
   );
 
@@ -93,16 +121,16 @@ function Index() {
     <main className="bg-background text-foreground font-body overflow-x-clip relative">
       <CursorFX />
       <FilmGrain />
-      <LoyaltyHud />
+      <LoyaltyHud dbTiers={dbTiers ?? []} dbRewards={dbRewards ?? []} />
       <ShareBar />
       <TopBar cartCount={cartCount} onOpenBook={() => openCheckout("book")} />
       <LiveKitchenTicker />
-      <HeroCinema onOrder={() => openCheckout("choose")} />
-      <MovieStory onOrder={() => openCheckout("order")} onBook={() => openCheckout("book")} />
+      <HeroCinema onOrder={() => openCheckout("choose")} heroVideo={heroVideo} />
+      <MovieStory onOrder={() => openCheckout("order")} onBook={() => openCheckout("book")} dbVideos={dbVideos} />
       <Manifesto />
-      <MenuSection cart={cart} onAdd={addToCart} />
+      <MenuSection cart={cart} onAdd={addToCart} menuItems={activeMenu} />
 
-      <RiderCam />
+      <RiderCam riderVideo={riderVideo} />
       <MapFlyTo />
       <StatsCounter />
       <SpinWheel
@@ -111,9 +139,10 @@ function Index() {
             localStorage.setItem("Injoy_promo", code);
           } catch {}
         }}
+        dbSegments={(dbWheel ?? []).filter((s: any) => s.active !== false)}
       />
-      <SlowMoCheesePull />
-      <GoogleReel />
+      <SlowMoCheesePull eatingVideo={eatingVideo} />
+      <GoogleReel dbImages={(dbImages ?? []).filter((img: any) => img.section === "lens" && img.active !== false)} />
 
       <Catering />
       <Reserve onReserve={() => openCheckout("book")} />
@@ -126,6 +155,7 @@ function Index() {
         onAdd={addToCart}
         onRemove={removeFromCart}
         onCheckout={() => openCheckout("order")}
+        menuItems={activeMenu}
       />
       <AnimatePresence>
         {checkoutOpen && (
@@ -147,6 +177,7 @@ function Index() {
               clearCart();
               setCheckoutMode("done");
             }}
+            menuItems={activeMenu}
           />
         )}
       </AnimatePresence>
@@ -238,7 +269,7 @@ function TopBar({ cartCount, onOpenBook }: { cartCount: number; onOpenBook: () =
 /* ============================================================
    HERO  — parallax mouse layers
    ============================================================ */
-function HeroCinema({ onOrder }: { onOrder: () => void }) {
+function HeroCinema({ onOrder, heroVideo }: { onOrder: () => void; heroVideo: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const scale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
@@ -278,7 +309,7 @@ function HeroCinema({ onOrder }: { onOrder: () => void }) {
       {/* video / burger layer */}
       <motion.div style={{ scale, y: burgerY, x: burgerX }} className="absolute inset-0">
         <video
-          src={HERO_VIDEO_SRC}
+          src={heroVideo}
           autoPlay
           muted
           loop
@@ -420,11 +451,13 @@ function ManifestoWord({
 function MenuSection({
   cart,
   onAdd,
+  menuItems,
 }: {
   cart: Record<string, number>;
   onAdd: (id: string) => void;
+  menuItems: MenuItem[];
 }) {
-  const categories: MenuItem["category"][] = ["Most Ordered", "Main Dish"];
+  const categories = [...new Set(menuItems.map((m) => m.category))];
   return (
     <section id="menu" className="relative px-6 py-24">
       <div className="flex justify-between items-baseline mb-10">
@@ -452,7 +485,7 @@ function MenuSection({
             <span className="h-px flex-1 bg-border" />
           </div>
           <div className="grid sm:grid-cols-2 gap-6">
-            {MENU.filter((m) => m.category === cat).map((item, i) => (
+            {menuItems.filter((m) => m.category === cat).map((item, i) => (
               <MenuCard
                 key={item.id}
                 item={item}
@@ -739,7 +772,7 @@ function MapFlyTo() {
 /* ============================================================
    SLOW-MO CHEESE PULL — ramps video playbackRate with scroll
    ============================================================ */
-function SlowMoCheesePull() {
+function SlowMoCheesePull({ eatingVideo }: { eatingVideo: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const { scrollYProgress } = useScroll({
@@ -764,7 +797,7 @@ function SlowMoCheesePull() {
         <motion.div style={{ scale }} className="absolute inset-0">
           <video
             ref={videoRef}
-            src={EATING_VIDEO_SRC}
+            src={eatingVideo}
             autoPlay
             muted
             loop
@@ -804,6 +837,7 @@ function CartDock({
   onAdd,
   onRemove,
   onCheckout,
+  menuItems,
 }: {
   cart: Record<string, number>;
   total: number;
@@ -811,11 +845,12 @@ function CartDock({
   onAdd: (id: string) => void;
   onRemove: (id: string) => void;
   onCheckout: () => void;
+  menuItems: MenuItem[];
 }) {
   const [open, setOpen] = useState(false);
   if (count === 0) return null;
   const lines = Object.entries(cart)
-    .map(([id, q]) => ({ item: MENU.find((m) => m.id === id)!, q }))
+    .map(([id, q]) => ({ item: menuItems.find((m) => m.id === id)!, q }))
     .filter((l) => l.item);
 
   return (
@@ -912,6 +947,7 @@ function CheckoutScene({
   lastResult,
   onClose,
   onPlaced,
+  menuItems,
 }: {
   mode: "choose" | "order" | "book" | "done";
   setMode: (m: "choose" | "order" | "book" | "done") => void;
@@ -920,6 +956,7 @@ function CheckoutScene({
   lastResult: { id: string; waLink: string; teLink: string } | null;
   onClose: () => void;
   onPlaced: (r: { id: string; waLink: string; teLink: string }) => void;
+  menuItems: MenuItem[];
 }) {
   return (
     <motion.div
@@ -979,6 +1016,7 @@ function CheckoutScene({
             total={total}
             onBack={() => setMode("choose")}
             onPlaced={onPlaced}
+            menuItems={menuItems}
           />
         )}
         {mode === "book" && <BookingForm onBack={() => setMode("choose")} onPlaced={onPlaced} />}
@@ -993,11 +1031,13 @@ function OrderForm({
   total,
   onBack,
   onPlaced,
+  menuItems,
 }: {
   cart: Record<string, number>;
   total: number;
   onBack: () => void;
   onPlaced: (r: { id: string; waLink: string; teLink: string }) => void;
+  menuItems: MenuItem[];
 }) {
   const placeOrderFn = useServerFn(placeOrder);
   const [name, setName] = useState("");
@@ -1007,7 +1047,7 @@ function OrderForm({
   const [err, setErr] = useState<string | null>(null);
 
   const items = Object.entries(cart).map(([id, qty]) => {
-    const m = MENU.find((x) => x.id === id)!;
+    const m = menuItems.find((x) => x.id === id)!;
     return { id, name: m.name, qty, price: m.price };
   });
 
@@ -1534,7 +1574,7 @@ function FooterStrip() {
 /* ============================================================
    RIDER CAM — Big cinematic rider hero with live HUD overlay
    ============================================================ */
-function RiderCam() {
+function RiderCam({ riderVideo }: { riderVideo: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -1594,7 +1634,7 @@ function RiderCam() {
           transition={{ duration: 0.55, repeat: Infinity, ease: "easeInOut" }}
         >
           <motion.video
-            src={RIDER_VIDEO_SRC}
+            src={riderVideo}
             poster={riderImg}
             autoPlay
             muted

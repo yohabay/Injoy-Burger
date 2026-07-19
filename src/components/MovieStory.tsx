@@ -55,7 +55,15 @@ const SCENES = [
   { n: "06", chapter: "Final Cut", title: "Your Table. Your Move." },
 ];
 
-export function MovieStory({ onOrder, onBook }: { onOrder: () => void; onBook: () => void }) {
+export function MovieStory({
+  onOrder,
+  onBook,
+  dbVideos,
+}: {
+  onOrder: () => void;
+  onBook: () => void;
+  dbVideos: any[] | undefined;
+}) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: wrapRef, offset: ["start start", "end end"] });
   const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.4 });
@@ -103,6 +111,7 @@ export function MovieStory({ onOrder, onBook }: { onOrder: () => void; onBook: (
             data={s}
             onOrder={onOrder}
             onBook={onBook}
+            dbVideos={dbVideos}
           />
         ))}
 
@@ -121,6 +130,7 @@ function Scene({
   data,
   onOrder,
   onBook,
+  dbVideos,
 }: {
   index: number;
   total: number;
@@ -128,6 +138,7 @@ function Scene({
   data: { n: string; chapter: string; title: string };
   onOrder: () => void;
   onBook: () => void;
+  dbVideos: any[] | undefined;
 }) {
   const seg = 1 / total;
   const start = index * seg;
@@ -148,7 +159,7 @@ function Scene({
       style={{ opacity, scale, y }}
       className="absolute inset-0 z-10 flex items-center justify-center"
     >
-      <SceneVisual index={index} progress={progress} start={start} end={end} />
+      <SceneVisual index={index} progress={progress} start={start} end={end} dbVideos={dbVideos} />
       <SceneOverlay data={data} index={index} onOrder={onOrder} onBook={onBook} />
     </motion.div>
   );
@@ -160,16 +171,38 @@ function SceneVisual({
   progress,
   start,
   end,
+  dbVideos,
 }: {
   index: number;
   progress: MotionValue<number>;
   start: number;
   end: number;
+  dbVideos: any[] | undefined;
 }) {
   const isMobile = useIsMobile();
   // slow Ken-Burns
   const k = useTransform(progress, [start, end], [1.05, 1.25]);
   const px = useTransform(progress, [start, end], ["-2%", "2%"]);
+
+  const getSceneVideo = (idx: number) => {
+    if (dbVideos && dbVideos.length > 0) {
+      const sceneVideos = dbVideos.filter(
+        (v: any) => v.section === "movie-story" && v.active !== false,
+      );
+      if (sceneVideos[idx]) return sceneVideos[idx].src;
+    }
+    return SCENE_VIDEOS[idx];
+  };
+
+  const getScenePoster = (idx: number) => {
+    if (dbVideos && dbVideos.length > 0) {
+      const sceneVideos = dbVideos.filter(
+        (v: any) => v.section === "movie-story" && v.active !== false,
+      );
+      if (sceneVideos[idx]) return sceneVideos[idx].poster ?? SCENE_POSTERS[idx];
+    }
+    return SCENE_POSTERS[idx];
+  };
 
   const gradients = [
     "bg-gradient-to-t from-black via-black/40 to-black/60",
@@ -183,13 +216,13 @@ function SceneVisual({
   return (
     <motion.div style={{ scale: k, x: px }} className="absolute inset-0">
       <video
-        src={SCENE_VIDEOS[index]}
+        src={getSceneVideo(index)}
         autoPlay
         muted
         loop
         playsInline
         preload={isMobile ? "metadata" : "auto"}
-        poster={SCENE_POSTERS[index]}
+        poster={getScenePoster(index)}
         className="absolute inset-0 h-full w-full object-cover"
       />
       <div className={`absolute inset-0 ${gradients[index]}`} />
